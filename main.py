@@ -23,15 +23,40 @@ PREFS = [
 
 def submit():
     selected = [pref for pref, var in pref_vars.items() if var.get()]
-    start = start_cal.get_date()
-    end = end_cal.get_date()
+    start_str = start_entry.get().strip()
+    end_str = end_entry.get().strip()
+
     if not selected:
         messagebox.showwarning("エラー", "少なくとも1つの都道府県を選択してください。")
         return
-    if start > end:
+    if not start_str or not end_str:
+        messagebox.showwarning("エラー", "開始日と終了日を入力してください。")
+        return
+
+    from datetime import datetime
+    try:
+        start_date = datetime.strptime(start_str, "%Y-%m-%d")
+        end_date = datetime.strptime(end_str, "%Y-%m-%d")
+    except ValueError:
+        messagebox.showwarning("エラー", "日付の形式が不正です。例: 2025-10-14")
+        return
+
+    if start_date > end_date:
         messagebox.showwarning("エラー", "終了日は開始日以降を選択してください。")
         return
-    messagebox.showinfo("設定完了", f"都道府県: {', '.join(selected)}\n期間: {start} ～ {end}")
+
+    data = {
+        "prefectures": selected,
+        "start_date": start_date.strftime("%Y-%m-%d"),
+        "end_date": end_date.strftime("%Y-%m-%d")
+    }
+
+    import os, json
+    filepath = os.path.abspath("config.json")
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
+
+    messagebox.showinfo("保存完了", f"設定を保存しました！\n保存場所: {filepath}")
 
 def layout_checkbuttons():
     #ウィンドウ幅に応じてチェックボックスを再配置
