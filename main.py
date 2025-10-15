@@ -1,15 +1,16 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import json
+from tkcalendar import DateEntry
 import subprocess
 import sys
 import os
+import json
 
 root = tk.Tk()
 root.title("シティリーグ一括応募ツール")
 root.geometry("700x600")
 
-# タイトル
+#タイトル
 ttk.Label(root, text="シティリーグ一括応募", font=("Meiryo", 14, "bold")).pack(pady=10)
 
 # 都道府県（番号: 名称）
@@ -24,9 +25,58 @@ PREFS = {
     40: "福岡県", 41: "佐賀県", 42: "長崎県", 43: "熊本県", 44: "大分県", 45: "宮崎県", 46: "鹿児島県", 47: "沖縄県"
 }
 
-pref_vars = {num: tk.IntVar() for num in PREFS.keys()}
+def submit():
+    # 選択内容の取得
+    selected_nums = [num for num, var in pref_vars.items() if var.get()]
+    start_str = start_entry.get().strip()
+    end_str = end_entry.get().strip()
+
+    if not selected_nums:
+        messagebox.showwarning("エラー", "少なくとも1つの都道府県を選択してください。")
+        return
+    if not start_str or not end_str:
+        messagebox.showwarning("エラー", "開始日と終了日を入力してください。")
+        return
+
+    from datetime import datetime
+    try:
+        start_date = datetime.strptime(start_str, "%Y-%m-%d")
+        end_date = datetime.strptime(end_str, "%Y-%m-%d")
+    except ValueError:
+        messagebox.showwarning("エラー", "日付の形式が不正です。例: 2025-10-14")
+        return
+
+    if start_date > end_date:
+        messagebox.showwarning("エラー", "終了日は開始日以降を選択してください。")
+        return
+
+    # JSONに保存
+    data = {
+        "prefectures": selected_nums,
+        "start_date": start_str,
+        "end_date": end_str
+    }
+
+    filepath = os.path.abspath("config.json")
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
+
+    messagebox.showinfo("保存完了", f"設定を保存しました！\n保存場所: {filepath}")
+
+    # === auto_entry.py を自動で実行 ===
+    # ここで script_path を定義します
+    script_path = os.path.join(os.path.dirname(__file__), "auto_entry.py")
+
+    try:
+        subprocess.Popen([sys.executable, script_path])
+        messagebox.showinfo("実行開始", "URL生成スクリプトを実行しました！")
+    except Exception as e:
+        messagebox.showerror("エラー", f"auto_entry.py の実行に失敗しました。\n{e}")
+
+
 
 def layout_checkbuttons():
+    #ウィンドウ幅に応じてチェックボックスを再配置
     for widget in frame_prefs.winfo_children():
         widget.grid_forget()
 
@@ -34,38 +84,15 @@ def layout_checkbuttons():
     if width < 200:
         width = 200
 
-    btn_width = 120
+    btn_width = 120  #チェックボックスの幅目安
     cols = max(1, width // btn_width)
+
 
     for i, (num, name) in enumerate(PREFS.items()):
         row, col = divmod(i, cols)
         chk = ttk.Checkbutton(frame_prefs, text=name, variable=pref_vars[num])
         chk.grid(row=row, column=col, sticky="w", padx=5, pady=2)
 
-def submit():
-    selected_nums = [num for num, var in pref_vars.items() if var.get()]
-    start = start_entry.get()
-    end = end_entry.get()
-
-    if not selected_nums:
-        messagebox.showwarning("エラー", "少なくとも1つの都道府県を選択してください。")
-        return
-
-    # JSONデータ作成
-    data = {
-        "prefectures": selected_nums,
-        "start_date": start,
-        "end_date": end
-    }
-
-    with open("config.json", "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
-
-    messagebox.showinfo("保存完了", "設定を config.json に保存しました！")
-
-    # auto_entry.py 実行
-    script_path = os.path.join(os.path.dirname(__file__), "auto_entry.py")
-    subprocess.Popen([sys.executable, script_path])
 
 # ラベルフレームのスタイル変更
 style = ttk.Style()
@@ -75,8 +102,12 @@ style.configure("BigLabel.TLabelframe.Label", font=("Meiryo", 12, "bold"))
 frame_prefs = ttk.LabelFrame(root, text="都道府県を選択（複数可）", padding=10, style="BigLabel.TLabelframe")
 frame_prefs.pack(fill="both", expand=True, padx=10, pady=10)
 
+pref_vars = {pref: tk.IntVar() for pref in PREFS}
+
 root.update_idletasks()
 layout_checkbuttons()
+
+# ウィンドウリサイズ時に再配置
 frame_prefs.bind("<Configure>", lambda e: layout_checkbuttons())
 
 # 期間登録
@@ -84,7 +115,7 @@ frame_date = ttk.LabelFrame(root, text="期間を選択", padding=10, style="Big
 frame_date.pack(fill="x", padx=10, pady=10)
 
 ttk.Label(frame_date, text="開始日 :").grid(row=0, column=0, padx=5, pady=5, sticky="e")
-ttk.Label(frame_date, text="例: 2025-10-14", font=("Meiryo", 9), foreground="gray").grid(row=1, column=1, sticky="w", padx=5)
+ttk.Label(frame_date, text="例: 2025-10-4", font=("Meiryo", 9), foreground="gray").grid(row=1, column=1, sticky="w", padx=5)
 start_entry = ttk.Entry(frame_date, width=15)
 start_entry.grid(row=0, column=1, padx=5, pady=5)
 
