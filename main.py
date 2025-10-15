@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from tkcalendar import DateEntry
+import subprocess
+import sys
+import os
 
 root = tk.Tk()
 root.title("シティリーグ一括応募ツール")
@@ -57,6 +60,10 @@ def submit():
         json.dump(data, f, indent=4, ensure_ascii=False)
 
     messagebox.showinfo("保存完了", f"設定を保存しました！\n保存場所: {filepath}")
+
+    # auto_entry.py を実行
+    script_path = os.path.join(os.path.dirname(__file__), "auto_entry.py")
+    subprocess.Popen([sys.executable, script_path])
 
 def layout_checkbuttons():
     #ウィンドウ幅に応じてチェックボックスを再配置
