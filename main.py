@@ -13,7 +13,7 @@ root.geometry("700x600")
 #タイトル
 ttk.Label(root, text="シティリーグ一括応募", font=("Meiryo", 14, "bold")).pack(pady=10)
 
-# 都道府県（番号: 名称）
+#都道府県（番号: 名称）
 PREFS = {
     1: "北海道", 2: "青森県", 3: "岩手県", 4: "宮城県", 5: "秋田県", 6: "山形県", 7: "福島県",
     8: "茨城県", 9: "栃木県", 10: "群馬県", 11: "埼玉県", 12: "千葉県", 13: "東京都", 14: "神奈川県",
@@ -26,11 +26,12 @@ PREFS = {
 }
 
 def submit():
-    # 選択内容の取得
+    #選択内容の取得
     selected_nums = [num for num, var in pref_vars.items() if var.get()]
     start_str = start_entry.get().strip()
-    end_str = end_entry.get().strip()
+    end_str = end_entry.get().strip()  
 
+    #バリデーションチェック
     if not selected_nums:
         messagebox.showwarning("エラー", "少なくとも1つの都道府県を選択してください。")
         return
@@ -50,7 +51,7 @@ def submit():
         messagebox.showwarning("エラー", "終了日は開始日以降を選択してください。")
         return
 
-    # JSONに保存
+    #JSONに保存
     data = {
         "prefectures": selected_nums,
         "start_date": start_str,
@@ -63,8 +64,8 @@ def submit():
 
     messagebox.showinfo("保存完了", f"設定を保存しました！\n保存場所: {filepath}")
 
-    # === auto_entry.py を自動で実行 ===
-    # ここで script_path を定義します
+    #script_pathを定義
+    #auto_entry.pyを自動で実行
     script_path = os.path.join(os.path.dirname(__file__), "auto_entry.py")
 
     try:
@@ -93,11 +94,6 @@ def layout_checkbuttons():
         chk = ttk.Checkbutton(frame_prefs, text=name, variable=pref_vars[num])
         chk.grid(row=row, column=col, sticky="w", padx=5, pady=2)
 
-
-# ラベルフレームのスタイル変更
-style = ttk.Style()
-style.configure("BigLabel.TLabelframe.Label", font=("Meiryo", 12, "bold"))
-
 # 都道府県複数選択
 frame_prefs = ttk.LabelFrame(root, text="都道府県を選択（複数可）", padding=10, style="BigLabel.TLabelframe")
 frame_prefs.pack(fill="both", expand=True, padx=10, pady=10)
@@ -107,10 +103,14 @@ pref_vars = {pref: tk.IntVar() for pref in PREFS}
 root.update_idletasks()
 layout_checkbuttons()
 
-# ウィンドウリサイズ時に再配置
+#ウィンドウリサイズ時に再配置
 frame_prefs.bind("<Configure>", lambda e: layout_checkbuttons())
 
-# 期間登録
+# ラベルフレームのスタイル変更
+style = ttk.Style()
+style.configure("BigLabel.TLabelframe.Label", font=("Meiryo", 12, "bold"))
+
+#期間登録
 frame_date = ttk.LabelFrame(root, text="期間を選択", padding=10, style="BigLabel.TLabelframe")
 frame_date.pack(fill="x", padx=10, pady=10)
 
