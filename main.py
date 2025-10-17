@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from tkcalendar import DateEntry
+from datetime import datetime
 import subprocess
 import sys
 import os
@@ -39,7 +40,6 @@ def submit():
         messagebox.showwarning("エラー", "開始日と終了日を入力してください。")
         return
 
-    from datetime import datetime
     try:
         start_date = datetime.strptime(start_str, "%Y-%m-%d")
         end_date = datetime.strptime(end_str, "%Y-%m-%d")

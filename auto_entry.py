@@ -25,7 +25,7 @@ target_url = f"{BASE_URL}?start_date={start_date}&end_date={end_date}&prefecture
 driver = webdriver.Chrome()
 wait = WebDriverWait(driver, 20)
 driver.get(target_url)
-print("🔄 ページを読み込み中...")
+print("ページを読み込み中...")
 time.sleep(4)    # JS描画待ち
 
 #Userログイン待ち
@@ -62,7 +62,7 @@ for i, t in enumerate(titles, start=1):
     print(f"  {i}: {t.text.strip()}")
 
 if not titles:
-    print("大会タイトルが見つかりません。ページ構成が変更されている可能性があります。")
+    print("大会タイトルが見つかりませんでした。")
     driver.quit()
     exit()
 
