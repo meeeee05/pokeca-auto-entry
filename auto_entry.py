@@ -141,7 +141,7 @@ for idx in range(len(titles)):
         time.sleep(3)
 
     except Exception as e:
-        print(f"❌ [{idx+1}] 処理中にエラーが発生しました: {e}")
+        print(f"[{idx+1}] 処理中にエラーが発生しました: {e}")
         driver.get(target_url)
         time.sleep(3)
         continue
