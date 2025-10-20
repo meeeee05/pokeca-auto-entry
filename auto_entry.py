@@ -109,13 +109,15 @@ for idx in range(len(titles)):
                 agree = wait.until(EC.element_to_be_clickable((By.ID, "agreement2")))
                 driver.execute_script("arguments[0].click();", agree)
                 label_id = label_elem.get_attribute("id")
-                print("利用規約に同意しました。（inputクリック）: {label_id}")
+                print("利用規約に同意しました。（inputクリック）")
             except Exception:
                 label_elem = wait.until(
                     EC.element_to_be_clickable((By.XPATH, "//label[contains(text(),'利用規約に同意する')]"))
                 )
+                #seleniumでJSを直接実行
                 driver.execute_script("arguments[0].click();", label_elem)
-                print("利用規約に同意しました。（ラベルクリック）")
+                #for_id = label_elem.get_attribute("for")
+                print(f"利用規約に同意しました。（ラベルクリック）")
             time.sleep(0.5)
         except Exception as e:
             print("利用規約チェックボックスが見つかりません（スキップ）:", e)
