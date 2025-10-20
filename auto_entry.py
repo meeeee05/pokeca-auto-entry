@@ -36,7 +36,7 @@ input("ログインが完了したら return を押してください。")
 print("\n 検索ページ再読み込み中...")
 driver.get(target_url)
 time.sleep(4)
-print("ログイン完了を確認、大会一覧を再取得中...")
+#print("ログイン完了を確認、大会一覧を再取得中...")
 
 
 #大会タイトル取得XPath
@@ -97,8 +97,8 @@ for idx in range(len(titles)):
             )
             driver.execute_script("arguments[0].click();", entry_btn)
             print("「イベント応募へ」をクリックしました。")
-        except Exception as ee:
-            print("「イベント応募へ」が見つかりませんでした（スキップ）:", ee)
+        except Exception as e:
+            print("「イベント応募へ」が見つかりませんでした（スキップ）:", e)
             driver.get(target_url)
             time.sleep(2)
             continue
@@ -108,7 +108,8 @@ for idx in range(len(titles)):
             try:
                 agree = wait.until(EC.element_to_be_clickable((By.ID, "agreement2")))
                 driver.execute_script("arguments[0].click();", agree)
-                print("利用規約に同意しました。（inputクリック）")
+                label_id = label_elem.get_attribute("id")
+                print("利用規約に同意しました。（inputクリック）: {label_id}")
             except Exception:
                 label_elem = wait.until(
                     EC.element_to_be_clickable((By.XPATH, "//label[contains(text(),'利用規約に同意する')]"))
@@ -116,8 +117,8 @@ for idx in range(len(titles)):
                 driver.execute_script("arguments[0].click();", label_elem)
                 print("利用規約に同意しました。（ラベルクリック）")
             time.sleep(0.5)
-        except Exception as ee:
-            print("利用規約チェックボックスが見つかりません（スキップ）:", ee)
+        except Exception as e:
+            print("利用規約チェックボックスが見つかりません（スキップ）:", e)
             driver.get(target_url)
             time.sleep(2)
             continue
@@ -127,8 +128,8 @@ for idx in range(len(titles)):
             apply_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'応募する')]")))
             driver.execute_script("arguments[0].click();", apply_btn)
             print("「応募する」をクリックしました。")
-        except Exception as ee:
-            print("「応募する」が見つかりません（スキップ）:", ee)
+        except Exception as e:
+            print("「応募する」が見つかりません（スキップ）:", e)
             driver.get(target_url)
             time.sleep(2)
             continue
